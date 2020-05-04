@@ -1,0 +1,4 @@
+cloud:
+  api_key: "" # required 
+  volume: # if you leave this key out, we will not create a volume. 
+    gigs: 1
