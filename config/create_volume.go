@@ -6,12 +6,12 @@ import (
 
 // CreateVolumeConfig - values needed to create a volume
 type CreateVolumeConfig struct {
-	GIGS int
+	Gigs int
 }
 
 // CreateVolume - Get config for create volume
 func CreateVolume() *CreateVolumeConfig {
-	volume := GetEnv("VOLUME_SIZE")
+	volume := GetEnv("VOLUME_SIZE", "volume.size")
 	if volume != nil {
 		volume, _ := strconv.Atoi(*volume)
 		return &CreateVolumeConfig{volume}

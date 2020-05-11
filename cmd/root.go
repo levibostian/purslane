@@ -1,13 +1,12 @@
 package cmd
 
 import (
-	"fmt"
-	"os"
-
 	"github.com/spf13/cobra"
 
 	homedir "github.com/mitchellh/go-homedir"
 	"github.com/spf13/viper"
+
+	"github.com/levibostian/purslane/ui"
 )
 
 var cfgFile string
@@ -32,8 +31,7 @@ to quickly create a Cobra application.`,
 // This is called by main.main(). It only needs to happen once to the rootCmd.
 func Execute() {
 	if err := rootCmd.Execute(); err != nil {
-		fmt.Println(err)
-		os.Exit(1)
+		ui.HandleError(err)
 	}
 }
 
@@ -53,10 +51,7 @@ func initConfig() {
 	} else {
 		// Find home directory.
 		home, err := homedir.Dir()
-		if err != nil {
-			fmt.Println(err)
-			os.Exit(1)
-		}
+		ui.HandleError(err)
 
 		// Search config in home directory with name ".purslane" (without extension).
 		viper.AddConfigPath(home)
@@ -67,8 +62,6 @@ func initConfig() {
 
 	// If a config file is found, read it in.
 	if err := viper.ReadInConfig(); err == nil {
-		fmt.Println("Using config file:", viper.ConfigFileUsed())
-
-		fmt.Println("value: ", viper.GetIntSlice("foo.values"))
+		ui.Message("Using config file: " + viper.ConfigFileUsed())
 	}
 }

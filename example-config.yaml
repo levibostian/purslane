@@ -1,4 +1,19 @@
-cloud:
-  api_key: "" # required 
-  volume: # if you leave this key out, we will not create a volume. 
-    gigs: 1
+cloud: # You must set a cloud provider 
+  digitalocean:
+    api_key: "123" 
+
+# volume required in order to create one. Leave it out to not create one. 
+volume: # if you leave this key out, we will not create a volume. 
+  gigs: 1
+
+# A server will always be created. but it will just default to one if you don't specify. 
+server:
+  # this format is universal with all providers but some providers may not have the combination you specify. This format will be converted to the string specific to the cloud provider for you. 
+  # the format of this string: `s-1cpu-1gb`
+  # s - standard. Can also be "m" for high memory or "c" for dedicated CPU. 
+  # 1cpu - how many CPUs you want. 
+  # 1gb - how many gigs of memory you want. 
+  size: "s-1cpu-1gb" 
+
+# required 
+public_ssh_key_path: "~/.ssh/id_rsa.pub"
