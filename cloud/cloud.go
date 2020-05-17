@@ -8,6 +8,8 @@ import (
 type Cloud interface {
 	createVolume(*config.CreateVolumeConfig) *CreatedVolume
 	createServer(*config.CoreConfig, *config.CreateServerConfig, *CreatedVolume) *CreatedServer
+	deleteVolume(*CreatedVolume)
+	deleteServer(*CreatedServer)
 }
 
 // CreatedVolume - info about created volume
@@ -19,8 +21,8 @@ type CreatedVolume struct {
 
 // CreatedServer - info about created server
 type CreatedServer struct {
-	ID         string
-	Name       string
+	DOExtras *DigitalOceanCreatedServerExtras
+
 	IPAddress  string
 	SSHPort    int
 	OSUsername string

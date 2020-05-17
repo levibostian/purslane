@@ -12,7 +12,7 @@ func ShouldNotHappen(err error) {
 	color.Red("[BUG] Something happened that should not have. That means there is probably a bug inside of Purslane.")
 	color.Red("Report an issue here: https://github.com/levibostian/Purslane/issues/new, and give this message:")
 	fmt.Print(err)
-	os.Exit(1)
+	panic("Exiting...")
 }
 
 // HandleError pass in error and we will handle it.

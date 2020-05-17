@@ -3,7 +3,6 @@ package cloud
 import (
 	"context"
 	"fmt"
-	"strconv"
 	"time"
 
 	"github.com/digitalocean/godo"
@@ -15,6 +14,11 @@ import (
 type digitalocean struct {
 	client godo.Client
 	Region string
+}
+
+type DigitalOceanCreatedServerExtras struct {
+	ID              int
+	CreatedSSHKeyId *int // We only want to delete the ssh key from your account if Purslane created it. That's why it's optional.
 }
 
 // GetDigitalOceanCloud -
@@ -44,13 +48,34 @@ func (cloud digitalocean) createVolume(config *config.CreateVolumeConfig) *Creat
 	return &CreatedVolume{volume.ID, createRequest.Name, createRequest.FilesystemLabel}
 }
 
+func (cloud digitalocean) deleteVolume(createdVolume *CreatedVolume) {
+	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
+	defer cancel()
+
+	_, err := cloud.client.Storage.DeleteVolume(ctx, createdVolume.ID)
+	ui.HandleError(err)
+}
+
+func (cloud digitalocean) deleteServer(createdServer *CreatedServer) {
+	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
+	defer cancel()
+
+	if sshKeyID := createdServer.DOExtras.CreatedSSHKeyId; sshKeyID != nil {
+		_, err := cloud.client.Keys.DeleteByID(ctx, *sshKeyID)
+		ui.HandleError(err)
+	}
+
+	_, err := cloud.client.Droplets.Delete(ctx, createdServer.DOExtras.ID)
+	ui.HandleError(err)
+}
+
 func (cloud digitalocean) createServer(coreConfig *config.CoreConfig, createServerConfig *config.CreateServerConfig, createdVolume *CreatedVolume) *CreatedServer {
 	cloud.assertAuth()
 
 	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
 	defer cancel()
 
-	sshKeyID := cloud.getSSHKeyReferenceID(coreConfig)
+	sshKeyID, createdSSHKey := cloud.getSSHKeyReferenceID(coreConfig)
 
 	createRequest := &godo.DropletCreateRequest{
 		Name:   "purslane",
@@ -82,15 +107,21 @@ func (cloud digitalocean) createServer(coreConfig *config.CoreConfig, createServ
 		ui.ShouldNotHappen(fmt.Errorf("Droplet created, but it does not have a public IP address. Droplet: %+v", droplet))
 	}
 
-	return &CreatedServer{strconv.FormatInt(int64(dropletID), 10), createRequest.Name, *ipAddress, 22, "root"}
+	var extrasSSHKeyID *int
+	if createdSSHKey {
+		extrasSSHKeyID = &sshKeyID
+	}
+	return &CreatedServer{&DigitalOceanCreatedServerExtras{dropletID, extrasSSHKeyID}, *ipAddress, 22, "root"}
 }
 
-func (cloud digitalocean) getSSHKeyReferenceID(coreConfig *config.CoreConfig) (sshKeyID int) {
+func (cloud digitalocean) getSSHKeyReferenceID(coreConfig *config.CoreConfig) (sshKeyID int, createdSSHKey bool) {
 	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
 	defer cancel()
 
 	ui.Message("Checking if the public SSH key given in config is found in your DigitalOcean account...")
 	key, _, err := cloud.client.Keys.GetByFingerprint(ctx, coreConfig.PublicSSHKeyFingerprint)
+	createdSSHKey = false
+
 	ui.HandleError(err)
 	if key == nil {
 		createdSSHKeyName := "Purslane Public SSH Key"
@@ -104,6 +135,8 @@ func (cloud digitalocean) getSSHKeyReferenceID(coreConfig *config.CoreConfig) (s
 
 		transfer, _, err := cloud.client.Keys.Create(ctx, createRequest)
 		ui.HandleError(err)
+
+		createdSSHKey = true
 
 		sshKeyID = transfer.ID
 	} else {

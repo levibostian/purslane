@@ -18,6 +18,14 @@ func CreateServer(coreConfig *config.CoreConfig, cloudConfig *config.CloudConfig
 	return cloudProvider.createServer(coreConfig, createServerConfig, createdVolume)
 }
 
+func DeleteVolume(cloudConfig *config.CloudConfig, createdVolume *CreatedVolume) {
+	getCloudProvider(cloudConfig).deleteVolume(createdVolume)
+}
+
+func DeleteServer(cloudConfig *config.CloudConfig, createdServer *CreatedServer) {
+	getCloudProvider(cloudConfig).deleteServer(createdServer)
+}
+
 func getCloudProvider(cloudConfig *config.CloudConfig) Cloud {
 	// Right now, we are only allowing DigitalOcean as a provider so, let's just create it.
 

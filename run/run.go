@@ -36,6 +36,11 @@ func Execute() {
 
 		ui.Message("Creating volume")
 		createdVolume = cloud.CreateVolume(cloudConfig, createVolumeConfig)
+
+		defer func() {
+			ui.Message("Deleting created volume.")
+			cloud.DeleteVolume(cloudConfig, createdVolume)
+		}()
 	}
 
 	createServerConfig := config.CreateServer()
@@ -43,6 +48,10 @@ func Execute() {
 
 	ui.Message("Creating server")
 	createdServer := cloud.CreateServer(coreConfig, cloudConfig, createServerConfig, createdVolume)
+	defer func() {
+		ui.Message("Deleting created server")
+		cloud.DeleteServer(cloudConfig, createdServer)
+	}()
 
 	// We want to only create 1 SSH session and run all commands against it.
 	sshExecutor := ssh.GetSSHExecutor(coreConfig, createdServer, createdVolume)
@@ -59,6 +68,9 @@ func Execute() {
 
 	ui.Message("Running Docker container in new server")
 	handleSSHSessionResult(sshExecutor.RunDockerImage())
+
+	ui.Message("Success! Cleaning up now...")
+	return // all defer statements will run in a stack, resulting in clean up functions being called.
 }
 
 func handleSSHSessionResult(successful bool) {
