@@ -56,20 +56,20 @@ func (cloud digitalocean) deleteVolume(createdVolume *CreatedVolume) {
 	ui.HandleError(err)
 }
 
-func (cloud digitalocean) deleteServer(createdServer *CreatedServer) {
+func (cloud digitalocean) deleteServer(serverReference *CreatedServerReference) {
 	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
 	defer cancel()
 
-	if sshKeyID := createdServer.DOExtras.CreatedSSHKeyId; sshKeyID != nil {
+	if sshKeyID := serverReference.DO.CreatedSSHKeyId; sshKeyID != nil {
 		_, err := cloud.client.Keys.DeleteByID(ctx, *sshKeyID)
 		ui.HandleError(err)
 	}
 
-	_, err := cloud.client.Droplets.Delete(ctx, createdServer.DOExtras.ID)
+	_, err := cloud.client.Droplets.Delete(ctx, serverReference.DO.ID)
 	ui.HandleError(err)
 }
 
-func (cloud digitalocean) createServer(coreConfig *config.CoreConfig, createServerConfig *config.CreateServerConfig, createdVolume *CreatedVolume) *CreatedServer {
+func (cloud digitalocean) createServer(coreConfig *config.CoreConfig, createServerConfig *config.CreateServerConfig, createdVolume *CreatedVolume) *CreatedServerReference {
 	cloud.assertAuth()
 
 	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
@@ -94,24 +94,45 @@ func (cloud digitalocean) createServer(coreConfig *config.CoreConfig, createServ
 	dropletID := droplet.ID
 	ui.Debug("DigitalOcean server created: %+v", *droplet)
 
-	ui.Message("Server created. Waiting until server is ready for connection...")
-	cloud.waitUntilServerAvailable(dropletID)
-
-	var ipAddress *string
-	for _, network := range droplet.Networks.V4 {
-		if network.Type == "public" {
-			ipAddress = &network.IPAddress
-		}
-	}
-	if ipAddress == nil {
-		ui.ShouldNotHappen(fmt.Errorf("Droplet created, but it does not have a public IP address. Droplet: %+v", droplet))
-	}
-
 	var extrasSSHKeyID *int
 	if createdSSHKey {
 		extrasSSHKeyID = &sshKeyID
 	}
-	return &CreatedServer{&DigitalOceanCreatedServerExtras{dropletID, extrasSSHKeyID}, *ipAddress, 22, "root"}
+
+	return &CreatedServerReference{&DigitalOceanCreatedServerExtras{dropletID, extrasSSHKeyID}}
+}
+
+func (cloud digitalocean) waitForServerToBeReady(serverReference *CreatedServerReference) *CreatedServer {
+	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
+	defer cancel()
+
+	ui.Message("Waiting until server is ready for connection...")
+
+	ipAddress := loopUntilServerReady(ctx, cloud, serverReference)
+
+	return &CreatedServer{*serverReference, ipAddress, 22, "root"}
+}
+
+func loopUntilServerReady(ctx context.Context, cloud digitalocean, serverReference *CreatedServerReference) (ipAddress string) {
+	droplet, _, err := cloud.client.Droplets.Get(ctx, serverReference.DO.ID)
+	ui.HandleError(err)
+
+	for _, network := range droplet.Networks.V4 {
+		if network.Type == "public" {
+			ipAddress = network.IPAddress
+
+			ui.Message("Server ready to connect!")
+
+			return
+		}
+	}
+
+	var secondsToWait time.Duration = 2
+
+	ui.Message(fmt.Sprintf("Server not ready. Retrying in %d seconds", secondsToWait))
+	time.Sleep(secondsToWait * time.Second)
+
+	return loopUntilServerReady(ctx, cloud, serverReference)
 }
 
 func (cloud digitalocean) getSSHKeyReferenceID(coreConfig *config.CoreConfig) (sshKeyID int, createdSSHKey bool) {
@@ -119,11 +140,15 @@ func (cloud digitalocean) getSSHKeyReferenceID(coreConfig *config.CoreConfig) (s
 	defer cancel()
 
 	ui.Message("Checking if the public SSH key given in config is found in your DigitalOcean account...")
-	key, _, err := cloud.client.Keys.GetByFingerprint(ctx, coreConfig.PublicSSHKeyFingerprint)
+	key, response, err := cloud.client.Keys.GetByFingerprint(ctx, coreConfig.PublicSSHKeyFingerprint)
+	if key == nil && response.StatusCode != 404 { // only handle error if we are not already handing it.
+		ui.HandleError(err)
+	}
+	sshKeyNeedsAddedToAccount := key == nil || response.StatusCode == 404
+
 	createdSSHKey = false
 
-	ui.HandleError(err)
-	if key == nil {
+	if sshKeyNeedsAddedToAccount {
 		createdSSHKeyName := "Purslane Public SSH Key"
 
 		ui.Message("Public SSH key given in config not found in DigitalOcean account. Adding it now. (Note: Name of created SSH key will be named %s in your account)", createdSSHKeyName)
@@ -166,28 +191,6 @@ func (cloud digitalocean) assertAuth() {
 	}
 
 	return
-}
-
-func (cloud digitalocean) waitUntilServerAvailable(dropletID int) {
-	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
-	defer cancel()
-
-	droplet, _, err := cloud.client.Droplets.Get(ctx, dropletID)
-	ui.HandleError(err)
-
-	dropletStatus := droplet.Status
-	if dropletStatus == "new" {
-		var secondsToWait time.Duration = 2
-
-		ui.Message(fmt.Sprintf("Server not ready. Retrying in %d seconds", secondsToWait))
-		time.Sleep(secondsToWait * time.Second)
-		cloud.waitUntilServerAvailable(dropletID)
-	} else if dropletStatus == "active" {
-		ui.Message("Server ready to connect!")
-		return
-	} else {
-		ui.Abort(fmt.Sprintf("Created server is in an invalid state, %s. Purslane cannot use a server that is in this unknown state.", dropletStatus))
-	}
 }
 
 // Wants format: "s-1vcpu-1gb"

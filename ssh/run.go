@@ -2,7 +2,9 @@ package ssh
 
 import (
 	"fmt"
+	"net"
 	"os"
+	"time"
 
 	"github.com/levibostian/purslane/cloud"
 	"github.com/levibostian/purslane/config"
@@ -14,7 +16,7 @@ type PurslaneSSHExecutor struct {
 	coreConfig *config.CoreConfig
 	server     *cloud.CreatedServer
 	volume     *cloud.CreatedVolume
-	session    *ssh.Session
+	sshClient  *ssh.Client
 }
 
 type SSHExecutor interface {
@@ -31,26 +33,26 @@ func GetSSHExecutor(coreConfig *config.CoreConfig, server *cloud.CreatedServer, 
 	config := &ssh.ClientConfig{
 		User: server.OSUsername,
 		Auth: []ssh.AuthMethod{ssh.PublicKeys(signer)},
+		HostKeyCallback: func(hostname string, remote net.Addr, key ssh.PublicKey) error {
+			return nil
+		},
+		Timeout: 10 * time.Second,
 	}
 
-	conn, _ := ssh.Dial("tcp", fmt.Sprintf("%s:%d", server.IPAddress, server.SSHPort), config)
-	session, err := conn.NewSession()
+	client, err := ssh.Dial("tcp", fmt.Sprintf("%s:%d", server.IPAddress, server.SSHPort), config)
 	ui.HandleError(err)
 
-	session.Stdout = os.Stdout
-	session.Stderr = os.Stderr
-
-	var sshExecutor SSHExecutor = PurslaneSSHExecutor{coreConfig, server, volume, session}
+	var sshExecutor SSHExecutor = PurslaneSSHExecutor{coreConfig, server, volume, client}
 
 	return sshExecutor
 }
 
 func (executor PurslaneSSHExecutor) DockerImagePull() bool {
-	return runSSHCommand(fmt.Sprintf("docker pull %s", executor.coreConfig.DockerImageName), executor.session)
+	return runSSHCommand(fmt.Sprintf("docker pull %s", executor.coreConfig.DockerImageName), executor.sshClient)
 }
 
 func (executor PurslaneSSHExecutor) DockerRegistryLogin() bool {
-	return runSSHCommand(fmt.Sprintf("echo \"%s\" | docker login %s --username %s --password-stdin", executor.coreConfig.DockerRegistry.Password, executor.coreConfig.DockerRegistry.RegistryName, executor.coreConfig.DockerRegistry.Username), executor.session)
+	return runSSHCommand(fmt.Sprintf("echo \"%s\" | docker login %s --username %s --password-stdin", executor.coreConfig.DockerRegistry.Password, executor.coreConfig.DockerRegistry.RegistryName, executor.coreConfig.DockerRegistry.Username), executor.sshClient)
 }
 
 func (executor PurslaneSSHExecutor) RunDockerImage() bool {
@@ -68,16 +70,30 @@ func (executor PurslaneSSHExecutor) RunDockerImage() bool {
 	// image name goes last in command.
 	dockerRunCommand = fmt.Sprintf("%s %s", dockerRunCommand, executor.coreConfig.DockerImageName)
 
-	return runSSHCommand(dockerRunCommand, executor.session)
+	return runSSHCommand(dockerRunCommand, executor.sshClient)
 }
 
 func (executor PurslaneSSHExecutor) Close() {
-	executor.session.Close()
+	executor.sshClient.Close()
 }
 
-func runSSHCommand(command string, session *ssh.Session) bool {
-	ui.Debug("[COMMAND] %s", command) // Running in Debug only mode because commands may contain private information.
-	err := session.Run(command)
+func runSSHCommand(command string, client *ssh.Client) bool {
+	session, err := client.NewSession()
+	if err != nil {
+		client.Close()
+		ui.HandleError(err)
+	}
 
-	return err != nil
+	session.Stdout = os.Stdout
+	session.Stderr = os.Stderr
+
+	ui.Debug("[COMMAND] %s", command) // Running in Debug only mode because commands may contain private information.
+	err = session.Run(command)
+
+	successful := err == nil
+	if !successful {
+		fmt.Println(err)
+	}
+
+	return successful
 }

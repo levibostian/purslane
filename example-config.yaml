@@ -16,7 +16,8 @@ server:
   # 1gb - how many gigs of memory you want. 
   size: "s-1cpu-1gb" 
 
-# required 
+# required
+# Note: At this time, SSH keys must not have a passphrase on them 
 public_ssh_key_path: "~/.ssh/id_rsa.pub"
 private_ssh_key_path: "~/.ssh/id_rsa"
 

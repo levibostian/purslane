@@ -7,9 +7,10 @@ import (
 // Cloud provider
 type Cloud interface {
 	createVolume(*config.CreateVolumeConfig) *CreatedVolume
-	createServer(*config.CoreConfig, *config.CreateServerConfig, *CreatedVolume) *CreatedServer
+	createServer(*config.CoreConfig, *config.CreateServerConfig, *CreatedVolume) *CreatedServerReference
+	waitForServerToBeReady(*CreatedServerReference) *CreatedServer
 	deleteVolume(*CreatedVolume)
-	deleteServer(*CreatedServer)
+	deleteServer(*CreatedServerReference)
 }
 
 // CreatedVolume - info about created volume
@@ -19,11 +20,15 @@ type CreatedVolume struct {
 	FileSystemMount string
 }
 
-// CreatedServer - info about created server
+// CreatedServer - info about created server. Available after server is ready.
 type CreatedServer struct {
-	DOExtras *DigitalOceanCreatedServerExtras
+	Reference CreatedServerReference
 
 	IPAddress  string
 	SSHPort    int
 	OSUsername string
+}
+
+type CreatedServerReference struct {
+	DO *DigitalOceanCreatedServerExtras
 }

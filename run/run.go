@@ -47,11 +47,13 @@ func Execute() {
 	ui.Debug("Create server config: %+v", *createServerConfig)
 
 	ui.Message("Creating server")
-	createdServer := cloud.CreateServer(coreConfig, cloudConfig, createServerConfig, createdVolume)
+	serverReference := cloud.CreateServer(coreConfig, cloudConfig, createServerConfig, createdVolume)
 	defer func() {
 		ui.Message("Deleting created server")
-		cloud.DeleteServer(cloudConfig, createdServer)
+		cloud.DeleteServer(cloudConfig, serverReference)
 	}()
+	createdServer := cloud.WaitForServerToBeReady(cloudConfig, serverReference)
+	ui.Debug("Server ready to connect %+v", *createdServer)
 
 	// We want to only create 1 SSH session and run all commands against it.
 	sshExecutor := ssh.GetSSHExecutor(coreConfig, createdServer, createdVolume)
@@ -78,6 +80,5 @@ func handleSSHSessionResult(successful bool) {
 		return
 	}
 
-	ui.Error("Command failed. Exiting...")
-	// TODO delete resources and all that stuff. Close ssh session first.
+	ui.Abort("Command failed. Exiting...")
 }
