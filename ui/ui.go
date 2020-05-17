@@ -5,7 +5,15 @@ import (
 	"os"
 
 	"github.com/fatih/color"
+	cliConfig "github.com/levibostian/purslane/cliconfig"
 )
+
+func ShouldNotHappen(err error) {
+	color.Red("[BUG] Something happened that should not have. That means there is probably a bug inside of Purslane.")
+	color.Red("Report an issue here: https://github.com/levibostian/Purslane/issues/new, and give this message:")
+	fmt.Print(err)
+	os.Exit(1)
+}
 
 // HandleError pass in error and we will handle it.
 func HandleError(err error) {
@@ -13,6 +21,14 @@ func HandleError(err error) {
 		Error("\nError encountered!")
 		fmt.Println(err)
 		os.Exit(1)
+	}
+}
+
+// Debug - Allows you to put anything you want inside. String, struct, etc. We will print that to the console.
+func Debug(format string, args ...interface{}) {
+	if cliConfig.CliConfig.Debug {
+		msg := fmt.Sprintf(format, args...)
+		color.Cyan("[DEBUG] " + msg)
 	}
 }
 
@@ -27,6 +43,7 @@ func Error(message string) {
 }
 
 // Message Show a neutral message in white
-func Message(message string) {
-	color.White(message)
+func Message(format string, args ...interface{}) {
+	msg := fmt.Sprintf(format, args...)
+	color.White(msg)
 }

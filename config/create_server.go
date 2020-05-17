@@ -34,7 +34,7 @@ func CreateServer() *CreateServerConfig {
 	serverSizeSplit := strings.Split(serverSizeString, "-")
 	serverSizeType := serverSizeSplit[0]
 	serverSizeCpus, _ := strconv.Atoi(strings.ReplaceAll(serverSizeSplit[1], "cpu", ""))
-	serverSizeMemory, _ := strconv.Atoi(strings.ReplaceAll(serverSizeSplit[1], "gb", ""))
+	serverSizeMemory, _ := strconv.Atoi(strings.ReplaceAll(serverSizeSplit[2], "gb", ""))
 
 	return &CreateServerConfig{serverSizeString, serverSizeType, serverSizeCpus, serverSizeMemory}
 }

@@ -19,6 +19,9 @@ type CreatedVolume struct {
 
 // CreatedServer - info about created server
 type CreatedServer struct {
-	ID   string
-	Name string
+	ID         string
+	Name       string
+	IPAddress  string
+	SSHPort    int
+	OSUsername string
 }

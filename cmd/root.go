@@ -6,10 +6,12 @@ import (
 	homedir "github.com/mitchellh/go-homedir"
 	"github.com/spf13/viper"
 
+	cliConfig "github.com/levibostian/purslane/cliconfig"
 	"github.com/levibostian/purslane/ui"
 )
 
 var cfgFile string
+var debug bool
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
@@ -41,6 +43,8 @@ func init() {
 	// Here you will define your flags and configuration settings.
 	// Cobra supports persistent flags, which, if defined here, will be global for your application.
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.purslane.yaml)")
+
+	rootCmd.PersistentFlags().BoolVar(&debug, "debug", false, "Show debug statements. Used for debugging program for bug reports and development. (default false)")
 }
 
 // initConfig reads in config file and ENV variables if set.
@@ -64,4 +68,6 @@ func initConfig() {
 	if err := viper.ReadInConfig(); err == nil {
 		ui.Message("Using config file: " + viper.ConfigFileUsed())
 	}
+
+	cliConfig.SetCliConfig(debug)
 }

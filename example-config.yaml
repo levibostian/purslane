@@ -17,3 +17,11 @@ server:
 
 # required 
 public_ssh_key_path: "~/.ssh/id_rsa.pub"
+private_ssh_key_path: "~/.ssh/id_rsa"
+
+docker: 
+  image: "image-name:tag"
+  registry: # optional. Only needed if image in private repo. 
+    name: "name-of-registry"
+    username: "docker-username"
+    password: "docker-password-to-registry"
