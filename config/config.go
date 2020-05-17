@@ -13,12 +13,18 @@ type DockerRegistryConfig struct {
 	Password     string
 }
 
+type DockerRunConfig struct {
+	ExtraArgs        *string
+	VolumeMountPoint string
+}
+
 type CoreConfig struct {
 	PublicSSHKeyFingerprint string
 	PublicSSHKey            string
 	PrivateSSHKey           string
 	DockerImageName         string
 	DockerRegistry          *DockerRegistryConfig
+	DockerRunConfig         DockerRunConfig
 }
 
 func GetCoreConfig() *CoreConfig {
@@ -28,7 +34,23 @@ func GetCoreConfig() *CoreConfig {
 	dockerImageName, dockerRegistryInfo, err := getDockerInformation()
 	ui.HandleError(err)
 
-	return &CoreConfig{sshKeyFingerprint, publicSSHKey, privateSSHKey, dockerImageName, dockerRegistryInfo}
+	dockerRunInfo := getDockerRunInfo()
+
+	return &CoreConfig{sshKeyFingerprint, publicSSHKey, privateSSHKey, dockerImageName, dockerRegistryInfo, dockerRunInfo}
+}
+
+func getDockerRunInfo() DockerRunConfig {
+	mountPoint := "/home"
+	if value := GetEnv("VOLUME_CONTAINER_MOUNT_PATH", "volume.container_mount_path"); value != nil {
+		mountPoint = *value
+	}
+
+	var extraArgs *string
+	if value := GetEnv("DOCKER_RUN_EXTRA_ARGS", "docker_run.extra_args"); value != nil {
+		extraArgs = value
+	}
+
+	return DockerRunConfig{extraArgs, mountPoint}
 }
 
 func getDockerInformation() (imageName string, registryInfo *DockerRegistryConfig, err error) {

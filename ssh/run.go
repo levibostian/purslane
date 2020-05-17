@@ -13,16 +13,18 @@ import (
 type PurslaneSSHExecutor struct {
 	coreConfig *config.CoreConfig
 	server     *cloud.CreatedServer
+	volume     *cloud.CreatedVolume
 	session    *ssh.Session
 }
 
 type SSHExecutor interface {
 	DockerImagePull() bool
 	DockerRegistryLogin() bool
+	RunDockerImage() bool
 	Close()
 }
 
-func GetSSHExecutor(coreConfig *config.CoreConfig, server *cloud.CreatedServer) SSHExecutor {
+func GetSSHExecutor(coreConfig *config.CoreConfig, server *cloud.CreatedServer, volume *cloud.CreatedVolume) SSHExecutor {
 	signer, err := ssh.ParsePrivateKey([]byte(coreConfig.PrivateSSHKey))
 	ui.HandleError(err)
 
@@ -38,7 +40,7 @@ func GetSSHExecutor(coreConfig *config.CoreConfig, server *cloud.CreatedServer) 
 	session.Stdout = os.Stdout
 	session.Stderr = os.Stderr
 
-	var sshExecutor SSHExecutor = PurslaneSSHExecutor{coreConfig, server, session}
+	var sshExecutor SSHExecutor = PurslaneSSHExecutor{coreConfig, server, volume, session}
 
 	return sshExecutor
 }
@@ -49,6 +51,24 @@ func (executor PurslaneSSHExecutor) DockerImagePull() bool {
 
 func (executor PurslaneSSHExecutor) DockerRegistryLogin() bool {
 	return runSSHCommand(fmt.Sprintf("echo \"%s\" | docker login %s --username %s --password-stdin", executor.coreConfig.DockerRegistry.Password, executor.coreConfig.DockerRegistry.RegistryName, executor.coreConfig.DockerRegistry.Username), executor.session)
+}
+
+func (executor PurslaneSSHExecutor) RunDockerImage() bool {
+	// Everything before options being added
+	dockerRunCommand := "docker run --name purslane_executed"
+
+	if executor.volume != nil {
+		dockerRunCommand = fmt.Sprintf("%s -v %s:%s", dockerRunCommand, executor.volume.FileSystemMount, executor.coreConfig.DockerRunConfig.VolumeMountPoint)
+	}
+
+	if extraArgs := executor.coreConfig.DockerRunConfig.ExtraArgs; extraArgs != nil {
+		dockerRunCommand = fmt.Sprintf("%s %s", dockerRunCommand, *extraArgs)
+	}
+
+	// image name goes last in command.
+	dockerRunCommand = fmt.Sprintf("%s %s", dockerRunCommand, executor.coreConfig.DockerImageName)
+
+	return runSSHCommand(dockerRunCommand, executor.session)
 }
 
 func (executor PurslaneSSHExecutor) Close() {

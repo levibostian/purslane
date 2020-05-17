@@ -45,7 +45,7 @@ func Execute() {
 	createdServer := cloud.CreateServer(coreConfig, cloudConfig, createServerConfig, createdVolume)
 
 	// We want to only create 1 SSH session and run all commands against it.
-	sshExecutor := ssh.GetSSHExecutor(coreConfig, createdServer)
+	sshExecutor := ssh.GetSSHExecutor(coreConfig, createdServer, createdVolume)
 	defer sshExecutor.Close()
 
 	if coreConfig.DockerRegistry != nil {
@@ -57,6 +57,8 @@ func Execute() {
 	ui.Message("Pulling Docker image in new server")
 	handleSSHSessionResult(sshExecutor.DockerImagePull())
 
+	ui.Message("Running Docker container in new server")
+	handleSSHSessionResult(sshExecutor.RunDockerImage())
 }
 
 func handleSSHSessionResult(successful bool) {
