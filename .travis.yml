@@ -1,0 +1,29 @@
+language: go
+
+install:
+  - echo "Skipping, will work when try to build later"
+
+jobs:
+  include:
+    - stage: commit 
+      script:
+        # lint commits to make sure they are conventional 
+        - curl -sf https://gobinaries.com/aevea/commitsar | sh; commitsar;
+        # Test binaries can all build successfully 
+        - curl -sL https://git.io/goreleaser | bash -s build --rm-dist --snapshot
+    - stage: master
+      script: 
+        # Use nvm to install and use the Node LTS version (nvm is installed on all Travis images)
+        - nvm install lts/*; npm i @semantic-release/git @semantic-release/changelog; npx semantic-release;
+    - stage: deploy
+      script: 
+        # Use goreleaser to deploy!
+        - curl -sL https://git.io/goreleaser | bash -s release # run `goreleaser release` CLI 
+
+stages:
+  - name: commit
+    if: type IN (push) AND tag IS blank
+  - name: master
+    if: type IN (push) AND branch = master
+  - name: deploy 
+    if: tag IS present 
