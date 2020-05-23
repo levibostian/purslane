@@ -8,7 +8,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/levibostian/purslane/ui"
+	"github.com/levibostian/Purslane/ui"
 )
 
 // Go by default does not handle ~/ in a file path. So, we try to take a string and expand it to the full file path.

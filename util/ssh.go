@@ -1,7 +1,7 @@
 package util
 
 import (
-	"github.com/levibostian/purslane/ui"
+	"github.com/levibostian/Purslane/ui"
 	"golang.org/x/crypto/ssh"
 )
 

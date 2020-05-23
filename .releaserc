@@ -7,6 +7,9 @@
             "changelogFile": "CHANGELOG.md"
         }],
         "@semantic-release/github",
-        "@semantic-release/git"
+        "@semantic-release/git",
+        ["@semantic-release/exec", {
+            "publishCmd": "curl -sL https://git.io/goreleaser | bash -s release"
+        }]
     ]
 }

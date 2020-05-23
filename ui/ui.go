@@ -5,7 +5,7 @@ import (
 	"os"
 
 	"github.com/fatih/color"
-	cliConfig "github.com/levibostian/purslane/cliconfig"
+	cliConfig "github.com/levibostian/Purslane/cliconfig"
 )
 
 func ShouldNotHappen(err error) {

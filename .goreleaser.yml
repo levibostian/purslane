@@ -6,6 +6,13 @@ builds:
       - CGO_ENABLED=0
     main: ./main.go
     binary: purslane
+    goos:
+    - windows
+    - darwin
+    - linux
+    ignore:
+    - goos: darwin
+      goarch: 386
 archives:
 - replacements:
     darwin: Darwin

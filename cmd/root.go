@@ -6,8 +6,8 @@ import (
 	homedir "github.com/mitchellh/go-homedir"
 	"github.com/spf13/viper"
 
-	cliConfig "github.com/levibostian/purslane/cliconfig"
-	"github.com/levibostian/purslane/ui"
+	cliConfig "github.com/levibostian/Purslane/cliconfig"
+	"github.com/levibostian/Purslane/ui"
 )
 
 var cfgFile string

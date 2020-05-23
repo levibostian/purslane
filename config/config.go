@@ -3,8 +3,8 @@ package config
 import (
 	"errors"
 
-	"github.com/levibostian/purslane/ui"
-	"github.com/levibostian/purslane/util"
+	"github.com/levibostian/Purslane/ui"
+	"github.com/levibostian/Purslane/util"
 )
 
 type DockerRegistryConfig struct {

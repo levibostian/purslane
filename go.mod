@@ -1,4 +1,4 @@
-module github.com/levibostian/purslane
+module github.com/levibostian/Purslane
 
 go 1.14
 
