@@ -5,12 +5,12 @@ import (
 )
 
 // Cloud provider
-type Cloud interface {
-	createVolume(*config.CreateVolumeConfig) *CreatedVolume
-	createServer(*config.CoreConfig, *config.CreateServerConfig, *CreatedVolume) *CreatedServerReference
-	waitForServerToBeReady(*CreatedServerReference) *CreatedServer
-	deleteVolume(*CreatedVolume)
-	deleteServer(*CreatedServerReference)
+type CloudProvider interface {
+	CreateVolume(*config.CreateVolumeConfig) *CreatedVolume
+	CreateServer(*config.CreateServerConfig, *CreatedVolume) *CreatedServerReference
+	WaitForServerToBeReady(*CreatedServerReference) *CreatedServer
+	DeleteVolume(*CreatedVolume)
+	DeleteServer(*CreatedServerReference)
 }
 
 // CreatedVolume - info about created volume
