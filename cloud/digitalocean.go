@@ -11,9 +11,10 @@ import (
 	"github.com/levibostian/Purslane/ui"
 )
 
-type digitalocean struct {
-	client godo.Client
-	Region string
+type digitaloceanCloudProvider struct {
+	coreConfig *config.CoreConfig
+	client     godo.Client
+	Region     string
 }
 
 type DigitalOceanCreatedServerExtras struct {
@@ -22,11 +23,11 @@ type DigitalOceanCreatedServerExtras struct {
 }
 
 // GetDigitalOceanCloud -
-func GetDigitalOceanCloud(config *config.CloudConfig) Cloud {
-	return digitalocean{*godo.NewFromToken(config.APIKey), "nyc1"}
+func GetDigitalOceanCloud(coreConfig *config.CoreConfig, config *config.CloudConfig) CloudProvider {
+	return digitaloceanCloudProvider{coreConfig, *godo.NewFromToken(config.APIKey), "nyc1"}
 }
 
-func (cloud digitalocean) createVolume(config *config.CreateVolumeConfig) *CreatedVolume {
+func (cloud digitaloceanCloudProvider) CreateVolume(config *config.CreateVolumeConfig) *CreatedVolume {
 	cloud.assertAuth()
 
 	createRequest := &godo.VolumeCreateRequest{
@@ -48,7 +49,7 @@ func (cloud digitalocean) createVolume(config *config.CreateVolumeConfig) *Creat
 	return &CreatedVolume{volume.ID, createRequest.Name, createRequest.FilesystemLabel}
 }
 
-func (cloud digitalocean) deleteVolume(createdVolume *CreatedVolume) {
+func (cloud digitaloceanCloudProvider) DeleteVolume(createdVolume *CreatedVolume) {
 	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
 	defer cancel()
 
@@ -56,7 +57,7 @@ func (cloud digitalocean) deleteVolume(createdVolume *CreatedVolume) {
 	ui.HandleError(err)
 }
 
-func (cloud digitalocean) deleteServer(serverReference *CreatedServerReference) {
+func (cloud digitaloceanCloudProvider) DeleteServer(serverReference *CreatedServerReference) {
 	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
 	defer cancel()
 
@@ -69,13 +70,13 @@ func (cloud digitalocean) deleteServer(serverReference *CreatedServerReference) 
 	ui.HandleError(err)
 }
 
-func (cloud digitalocean) createServer(coreConfig *config.CoreConfig, createServerConfig *config.CreateServerConfig, createdVolume *CreatedVolume) *CreatedServerReference {
+func (cloud digitaloceanCloudProvider) CreateServer(createServerConfig *config.CreateServerConfig, createdVolume *CreatedVolume) *CreatedServerReference {
 	cloud.assertAuth()
 
 	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
 	defer cancel()
 
-	sshKeyID, createdSSHKey := cloud.getSSHKeyReferenceID(coreConfig)
+	sshKeyID, createdSSHKey := cloud.getSSHKeyReferenceID(cloud.coreConfig)
 
 	createRequest := &godo.DropletCreateRequest{
 		Name:   "purslane",
@@ -102,7 +103,7 @@ func (cloud digitalocean) createServer(coreConfig *config.CoreConfig, createServ
 	return &CreatedServerReference{&DigitalOceanCreatedServerExtras{dropletID, extrasSSHKeyID}}
 }
 
-func (cloud digitalocean) waitForServerToBeReady(serverReference *CreatedServerReference) *CreatedServer {
+func (cloud digitaloceanCloudProvider) WaitForServerToBeReady(serverReference *CreatedServerReference) *CreatedServer {
 	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
 	defer cancel()
 
@@ -113,7 +114,7 @@ func (cloud digitalocean) waitForServerToBeReady(serverReference *CreatedServerR
 	return &CreatedServer{*serverReference, ipAddress, 22, "root"}
 }
 
-func loopUntilServerReady(ctx context.Context, cloud digitalocean, serverReference *CreatedServerReference) (ipAddress string) {
+func loopUntilServerReady(ctx context.Context, cloud digitaloceanCloudProvider, serverReference *CreatedServerReference) (ipAddress string) {
 	droplet, _, err := cloud.client.Droplets.Get(ctx, serverReference.DO.ID)
 	ui.HandleError(err)
 
@@ -135,7 +136,7 @@ func loopUntilServerReady(ctx context.Context, cloud digitalocean, serverReferen
 	return loopUntilServerReady(ctx, cloud, serverReference)
 }
 
-func (cloud digitalocean) getSSHKeyReferenceID(coreConfig *config.CoreConfig) (sshKeyID int, createdSSHKey bool) {
+func (cloud digitaloceanCloudProvider) getSSHKeyReferenceID(coreConfig *config.CoreConfig) (sshKeyID int, createdSSHKey bool) {
 	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
 	defer cancel()
 
@@ -171,7 +172,7 @@ func (cloud digitalocean) getSSHKeyReferenceID(coreConfig *config.CoreConfig) (s
 	return
 }
 
-func (cloud digitalocean) assertAuth() {
+func (cloud digitaloceanCloudProvider) assertAuth() {
 	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
 	defer cancel()
 	apiKeyInvalidMessage := "Sorry! The API key you gave for DigitalOcean is not associated with a DigitalOcean account."

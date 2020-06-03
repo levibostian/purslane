@@ -28,6 +28,8 @@ func Execute() {
 	}
 	ui.Debug("Cloud provider config: %+v", *cloudConfig)
 
+	cloudProvider := cloud.GetCloudProvider(coreConfig, cloudConfig)
+
 	ui.Debug("Getting volume config")
 	createVolumeConfig := config.CreateVolume()
 	var createdVolume *cloud.CreatedVolume = nil
@@ -35,11 +37,11 @@ func Execute() {
 		ui.Debug("Volume config exists: %+v", *createVolumeConfig)
 
 		ui.Message("Creating volume")
-		createdVolume = cloud.CreateVolume(cloudConfig, createVolumeConfig)
+		createdVolume = cloudProvider.CreateVolume(createVolumeConfig)
 
 		defer func() {
 			ui.Message("Deleting created volume.")
-			cloud.DeleteVolume(cloudConfig, createdVolume)
+			cloudProvider.DeleteVolume(createdVolume)
 		}()
 	}
 
@@ -47,12 +49,12 @@ func Execute() {
 	ui.Debug("Create server config: %+v", *createServerConfig)
 
 	ui.Message("Creating server")
-	serverReference := cloud.CreateServer(coreConfig, cloudConfig, createServerConfig, createdVolume)
+	serverReference := cloudProvider.CreateServer(createServerConfig, createdVolume)
 	defer func() {
 		ui.Message("Deleting created server")
-		cloud.DeleteServer(cloudConfig, serverReference)
+		cloudProvider.DeleteServer(serverReference)
 	}()
-	createdServer := cloud.WaitForServerToBeReady(cloudConfig, serverReference)
+	createdServer := cloudProvider.WaitForServerToBeReady(serverReference)
 	ui.Debug("Server ready to connect %+v", *createdServer)
 
 	// We want to only create 1 SSH session and run all commands against it.
