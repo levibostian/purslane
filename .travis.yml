@@ -3,6 +3,10 @@ language: go
 go: 
   - 1.x
 
+# https://github.com/aevea/commitsar/issues/230
+git:
+  depth: false
+
 jobs:
   include:
     - stage: commit 
