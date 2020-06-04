@@ -1,3 +1,10 @@
+## [1.0.1](https://github.com/levibostian/Purslane/compare/1.0.0...1.0.1) (2020-06-04)
+
+
+### Bug Fixes
+
+* cli help docs have non-default values ([1b2e388](https://github.com/levibostian/Purslane/commit/1b2e388a0688621a70379220b91e834115bc5b1c))
+
 # 1.0.0 (2020-05-23)
 
 
