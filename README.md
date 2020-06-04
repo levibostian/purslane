@@ -2,7 +2,10 @@
 
 Scalable, flexible, affordable, and safe way to perform periodic tasks. All from a convenient CLI binary!
 
-*Note:* Purslane is in development. It is being used in production for 1 or 2 projects to test it out but that's the extent of the testing thus far. 
+*Note:* 
+1. Purslane is being used in production for 1 or 2 projects to test it out but that's the extent of the testing thus far. 
+2. The project is young so breaking changes may occur. However, this project will do it's best to always be safe to use by following semantic versioning. 
+3. Purslane has only been tested through use and is not unit tested. It is planned, but has not yet been completed. 
 
 ![logo](misc/logo.jpg)
 > credits: PaoloBis / Getty Images
@@ -11,9 +14,9 @@ Scalable, flexible, affordable, and safe way to perform periodic tasks. All from
 
 Let's use an example. You have a production database that you want to perform daily backups on. This seems like a simple task, but there are some issues that you could run into:
 
-* **What machine should I run my backup on?...** Performing database backups takes resources (CPU, memory) and you don't want a daily backup to slow down your servers. 
+* **What machine should I run my backup on?...** Performing database backups takes resources (CPU, memory) and you don't want a daily backup to slow down your servers so it's best to run backups on a separate machine with resources that can handle the backup. 
 * **Disk storage...** As the size of your database grows, you will need larger disk storage to store the dump on. 
-* **Pain to scale...** After you setup your server for database dumps, your app gets popular as time goes on, you will need to spend time upgrading your backup system to handle the new load.
+* **Pain to scale...** After you setup your server for database dumps, your app gets popular. As time goes on you will need to spend time upgrading your backup system to handle the new load.
 * **Higher costs...** If I run backups daily, that means that 23 1/2 hours of each day that server is doing nothing and you still need to pay for it.
 
 Purslane solves all of these problems for you! Let's read about how Purslane works to understand how all of these problems are gone.
@@ -21,15 +24,15 @@ Purslane solves all of these problems for you! Let's read about how Purslane wor
 ## How does Purslane work?
 
 Purslane is quite simple, really. Each time Purslane is run, it will:
-1. Create a new cloud server and optionally attach disk storage to it. 
-2. Run a Docker container in the newly created cloud server. 
+1. Create a new cloud server and optionally attach disk storage to it. (Purslane works with [DigitalOcean](https://www.digitalocean.com/) at this time but may include other cloud providers in the future)
+2. Run a Docker container of your choice in the newly created cloud server. 
 3. When the Docker container exits, Purslane will destroy all of the resources it created such as the created server and disk storage. 
 
 For you, this means:
 * **Your application has no performance hit...** Because your task runs on a brand new server, your infrastructure does not take a hit. 
-* **Scale with 1 line of code...** As the size of your application grows and you need to scale your periodic tasks, it only takes 1 quick change to your config file and Purslane will scale your server and disk storage the next time you run your task. 
+* **Scale with 1 line of code...** As the size of your application grows and you need to scale your periodic tasks, it only takes 1 quick change to your Purslane config file and Purslane will scale the created server and disk storage the next time you run your task. 
 * **Affordable...** You only pay for the time your Docker container runs. 
-* **Flexible...** Run any task you need! You are the only that makes the Docker container, so you can run anything you need to run! All language, any software, any task. 
+* **Flexible...** Run any task you need! You are the only that makes the Docker container, so you can run anything you need to run! Any language, any software, any task. 
 
 All you need to do is give Purslane authentication details to login to your cloud provider to create the server, set the size of the server and optional disk storage you want, and provide the Docker image to run. Purslane will take care of the rest. 
 
@@ -37,9 +40,54 @@ All you need to do is give Purslane authentication details to login to your clou
 
 Getting started docs coming soon... Purslane needs to be deployed first, then it can be installed and executed. 
 
-# Configuration 
+* Install the CLI. You can download the executable for your machine in the [GitHub releases](https://github.com/levibostian/purslane/releases) or run this command:
 
-...coming soon... in the mean time, check out the `example-config.yaml` file. 
+```
+curl -sf https://gobinaries.com/levibostian/Purslane | sh
+```
+
+* Create config file. You can create it in the default location of `~/.purslane` or create it anywhere and point to it with the `--config` CLI argument. 
+
+```yaml
+cloud: # Required. Must set a cloud provider. At this time, Purslane only works with DigitalOcean
+  digitalocean:
+    # Create an API key with write access as we are creating resources. 
+    # https://www.digitalocean.com/docs/apis-clis/api/create-personal-access-token/
+    api_key: "123" 
+
+volume: # Optional, but required if you want to create a volume that attaches to the server. 
+  gigs: 1 # How many GBs you want the volume to be. 
+  container_mount_path: "/home" # The path inside of your Docker container you want the volume to attach to. 
+
+server: # Optional - sets default values for you if left out. 
+  # this format is universal with all providers but some providers may not have the combination you specify. This format will be converted to the string specific to the cloud provider for you. 
+  # the format of this string: `s-1cpu-1gb`
+  # s - standard. Can also be "m" for high memory or "c" for dedicated CPU. 
+  # 1cpu - how many CPUs you want. 
+  # 1gb - how many gigs of memory you want. 
+  size: "s-1cpu-1gb" 
+
+# Required. These keys are used to run commands against the server once it's created. The machine you run the CLI from will SSH into the created server and send commands to it. 
+# **Note:** At this time, SSH keys must not have a passphrase on them 
+public_ssh_key_path: "~/.ssh/id_rsa.pub"
+private_ssh_key_path: "~/.ssh/id_rsa"
+
+docker_run: # Optional. Purslane runs a default set that will run the docker container just fine. 
+  extra_args: "-p 5000:5000" # Append arguments to the `docker run` command. Great place to add ports bindings or environment variables, for example. 
+
+docker: # Required. 
+  image: "image-name:tag" # Image with tag of docker image to pull. Can be from private or public repo. 
+  registry: # optional. Only needed if image in private repo you need to authenticate with. 
+    name: "name-of-registry"
+    username: "docker-username"
+    password: "docker-password-to-registry"
+```
+
+* Run the CLI! 
+
+```
+purslane run 
+```
 
 ## Development 
 
