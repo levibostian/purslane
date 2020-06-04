@@ -16,13 +16,13 @@ var debug bool
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:   "purslane",
-	Short: "A brief description of your application",
-	Long: `A longer description that spans multiple lines and likely contains
-examples and usage of using your application. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+	Short: "Scalable, flexible, affordable, and safe way to perform periodic tasks.",
+	Long: `Scalable, flexible, affordable, and safe way to perform periodic tasks.
+	
+Purslane is quite simple, really. Each time Purslane is run, it will:
+1. Create a new cloud server and optionally attach disk storage to it. (Purslane works with [DigitalOcean](https://www.digitalocean.com/) at this time but may include other cloud providers in the future)
+2. Run a Docker container of your choice in the newly created cloud server. 
+3. When the Docker container exits, Purslane will destroy all of the resources it created such as the created server and disk storage.`,
 	// Uncomment the following line if your bare application
 	// has an action associated with it:
 	// Run: func(cmd *cobra.Command, args []string) {
@@ -42,7 +42,7 @@ func init() {
 
 	// Here you will define your flags and configuration settings.
 	// Cobra supports persistent flags, which, if defined here, will be global for your application.
-	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.purslane.yaml)")
+	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is ~/.purslane)")
 
 	rootCmd.PersistentFlags().BoolVar(&debug, "debug", false, "Show debug statements. Used for debugging program for bug reports and development. (default false)")
 }
