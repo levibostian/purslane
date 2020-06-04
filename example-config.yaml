@@ -1,14 +1,14 @@
-cloud: # You must set a cloud provider 
+cloud: # Required. Must set a cloud provider. At this time, Purslane only works with DigitalOcean
   digitalocean:
+    # Create an API key with write access as we are creating resources. 
+    # https://www.digitalocean.com/docs/apis-clis/api/create-personal-access-token/
     api_key: "123" 
 
-# volume required in order to create one. Leave it out to not create one. 
-volume: # if you leave this key out, we will not create a volume. 
-  gigs: 1
-  container_mount_path: "/home" 
+volume: # Optional, but required if you want to create a volume that attaches to the server. 
+  gigs: 1 # How many GBs you want the volume to be. 
+  container_mount_path: "/home" # The path inside of your Docker container you want the volume to attach to. 
 
-# A server will always be created. but it will just default to one if you don't specify. 
-server:
+server: # Optional - sets default values for you if left out. 
   # this format is universal with all providers but some providers may not have the combination you specify. This format will be converted to the string specific to the cloud provider for you. 
   # the format of this string: `s-1cpu-1gb`
   # s - standard. Can also be "m" for high memory or "c" for dedicated CPU. 
@@ -16,17 +16,17 @@ server:
   # 1gb - how many gigs of memory you want. 
   size: "s-1cpu-1gb" 
 
-# required
-# Note: At this time, SSH keys must not have a passphrase on them 
+# Required. These keys are used to run commands against the server once it's created. The machine you run the CLI from will SSH into the created server and send commands to it. 
+# **Note:** At this time, SSH keys must not have a passphrase on them 
 public_ssh_key_path: "~/.ssh/id_rsa.pub"
 private_ssh_key_path: "~/.ssh/id_rsa"
 
-docker_run:
-  extra_args: "-p 5000:5000"
+docker_run: # Optional. Purslane runs a default set that will run the docker container just fine. 
+  extra_args: "-p 5000:5000" # Append arguments to the `docker run` command. Great place to add ports bindings or environment variables, for example. 
 
-docker: 
-  image: "image-name:tag"
-  registry: # optional. Only needed if image in private repo. 
+docker: # Required. 
+  image: "image-name:tag" # Image with tag of docker image to pull. Can be from private or public repo. 
+  registry: # optional. Only needed if image in private repo you need to authenticate with. 
     name: "name-of-registry"
     username: "docker-username"
     password: "docker-password-to-registry"
