@@ -25,6 +25,11 @@ checksum:
 snapshot:
   name_template: "{{ .Tag }}-next"
 
+dockers:
+  - image_templates:
+    - "levibostian/purslane:latest"
+    - "levibostian/purslane:{{ .Tag }}"
+  
 # skip changelog generation because semantic release does that for us already. Go releaser updates existing github releases if there is one.
 changelog:
   skip: true 

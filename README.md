@@ -38,15 +38,9 @@ All you need to do is give Purslane authentication details to login to your clou
 
 # Getting started
 
-Getting started docs coming soon... Purslane needs to be deployed first, then it can be installed and executed. 
+* The first thing you will need is to create a Docker image for Purslane to execute. You can host this Docker image in a public or private Docker image registry. 
 
-* Install the CLI. You can download the executable for your machine in the [GitHub releases](https://github.com/levibostian/purslane/releases) or run this command:
-
-```
-curl -sf https://gobinaries.com/levibostian/Purslane | sh
-```
-
-* Create config file. You can create it in the default location of `~/.purslane` or create it anywhere and point to it with the `--config` CLI argument. 
+* Create the Purslane config file that tells Purslane how to execute your Docker image. You can create it in the default location of `~/.purslane` or create it anywhere and point to it with the `--config` CLI argument. 
 
 ```yaml
 cloud: # Required. Must set a cloud provider. At this time, Purslane only works with DigitalOcean
@@ -86,21 +80,38 @@ docker: # Required.
     password: "docker-password-to-registry"
 ```
 
-* Run the CLI! 
+> Note: This file contains secret information such as API keys. It's recommended that you make this config file read-only by select users on your machine. 
+
+* Time to execute Purslane. You decide how you would like to execute the CLI. [Run the CLI on a server](#run-cli-on-a-server) or [run via Docker](#run-cli-via-docker). 
+
+### Run CLI on a server 
+
+Since Purslane is a very low resources CLI application, you can run it directly on a server of yours. 
+
+If you create your Purslane config file on your server, you can install the CLI easily from [GitHub releases](https://github.com/levibostian/purslane/releases) with 1 command:
 
 ```
-purslane run 
+curl -sf https://gobinaries.com/levibostian/Purslane | sh
 ```
+
+You now have the CLI installed on your machine. Run `purslane --help` to learn about the CLI. 
+
+### Run CLI via Docker
+
+You can run the Purslane CLI via a Docker image. There is [a public Purslane Docker image](https://hub.docker.com/levibostian/purslane) for you to use. When you want to use the Docker image, you need to provide to the Docker image your config file, ssh public/private key files, and maybe you need to provide other files. 
+
+Here is an example `docker run` statement to run the Docker purslane CLI:
+```
+docker run --rm -v $(pwd)/purslane.yaml:/root/.purslane.yaml -v /home/.ssh/:/root/ssh purslane:latest
+```
+
+The Purslane Docker image does have the 1 assumption that you need to provide the config file to `/root/.purslane.yaml` on the image. Besides that, all other files you provide to the Docker container is all configurable to you because you set all of the paths inside of your purslane config file (example: the ssh files). 
+
+The Purslane public docker image tries to be as minimal as possible. [Check out the Dockerfile](Dockerfile) to learn more.
 
 ## Development 
 
 Purslane is a Go lang program. To start developing Purslane is as simple as (1) cloning the repo and (2) running `go run main.go`.
-
-## Author
-
-* Levi Bostian - [GitHub](https://github.com/levibostian), [Twitter](https://twitter.com/levibostian), [Website/blog](http://levibostian.com)
-
-![Levi Bostian image](https://gravatar.com/avatar/22355580305146b21508c74ff6b44bc5?s=250)
 
 ## Contribute
 

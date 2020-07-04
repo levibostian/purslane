@@ -16,7 +16,7 @@ jobs:
     - stage: test
       script:        
         # Test binaries can all build successfully 
-        - curl -sL https://git.io/goreleaser | bash -s build --rm-dist --snapshot
+        - curl -sL https://git.io/goreleaser | bash -s build --rm-dist --snapshot    
     - stage: deploy
       script: 
         # Use nvm to install and use the Node LTS version (nvm is installed on all Travis images)
