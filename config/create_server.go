@@ -10,10 +10,11 @@ import (
 
 // CreateServerConfig -
 type CreateServerConfig struct {
-	Size       string // size string that is universally used for purslane. it will be converted to the cloud's own type later. This is parsed into smaller values below.
-	SizeType   string
-	SizeCPU    int
-	SizeMemory int
+	Size           string // size string that is universally used for purslane. it will be converted to the cloud's own type later. This is parsed into smaller values below.
+	SizeType       string
+	SizeCPU        int
+	SizeMemory     int
+	PrivateNetwork *string // string or nil
 }
 
 // CreateServer -
@@ -36,5 +37,7 @@ func CreateServer() *CreateServerConfig {
 	serverSizeCpus, _ := strconv.Atoi(strings.ReplaceAll(serverSizeSplit[1], "cpu", ""))
 	serverSizeMemory, _ := strconv.Atoi(strings.ReplaceAll(serverSizeSplit[2], "gb", ""))
 
-	return &CreateServerConfig{serverSizeString, serverSizeType, serverSizeCpus, serverSizeMemory}
+	privateNetwork := GetEnv("SERVER_PRIVATE_NETWORK", "server.private_network")
+
+	return &CreateServerConfig{serverSizeString, serverSizeType, serverSizeCpus, serverSizeMemory, privateNetwork}
 }
