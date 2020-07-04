@@ -1,3 +1,10 @@
+# [1.1.0](https://github.com/levibostian/Purslane/compare/1.0.1...1.1.0) (2020-07-04)
+
+
+### Features
+
+* add private networking ability ([00a4c19](https://github.com/levibostian/Purslane/commit/00a4c19149bb992a9f71c3ff699c15e3ba702f79))
+
 ## [1.0.1](https://github.com/levibostian/Purslane/compare/1.0.0...1.0.1) (2020-06-04)
 
 
