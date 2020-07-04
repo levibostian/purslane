@@ -100,6 +100,14 @@ func (cloud digitaloceanCloudProvider) CreateServer(createServerConfig *config.C
 		extrasSSHKeyID = &sshKeyID
 	}
 
+	if createServerConfig.PrivateNetwork != nil {
+		ui.Debug("Private networking found in Purslane config file. Adding private network.")
+		cloud.assertVPC(*createServerConfig.PrivateNetwork)
+
+		createRequest.PrivateNetworking = true
+		createRequest.VPCUUID = *createServerConfig.PrivateNetwork
+	}
+
 	return &CreatedServerReference{&DigitalOceanCreatedServerExtras{dropletID, extrasSSHKeyID}}
 }
 
@@ -190,6 +198,21 @@ func (cloud digitaloceanCloudProvider) assertAuth() {
 			ui.Abort("Sorry! The API key you gave for DigitalOcean belongs to an account, but the account is not active. Login to your DigitalOcean account to fix it then try again.")
 		}
 	}
+
+	return
+}
+
+func (cloud digitaloceanCloudProvider) assertVPC(vpcID string) {
+	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
+	defer cancel()
+
+	ui.Debug(fmt.Sprintf("Asserting that VPC with given ID, %s, is in DigitalOcean account", vpcID))
+
+	vpc, _, err := cloud.client.VPCs.Get(ctx, vpcID)
+	if vpc == nil {
+		ui.Abort(fmt.Sprintf("DigitalOcean VPC with given ID, %s, is not found in account.", vpcID))
+	}
+	ui.HandleError(err)
 
 	return
 }

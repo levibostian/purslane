@@ -66,6 +66,9 @@ server: # Optional - sets default values for you if left out.
   # 1cpu - how many CPUs you want. 
   # 1gb - how many gigs of memory you want. 
   size: "s-1cpu-1gb" 
+  # private network to add server to when created. (optional)
+  #  - DigitalOcean: Enter UUID of already created private network. Find UUID in DigitalOcean's website > select a VPC > See UUID in URL of webpage. 
+  private_network: "XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX" 
 
 # Required. These keys are used to run commands against the server once it's created. The machine you run the CLI from will SSH into the created server and send commands to it. 
 # **Note:** At this time, SSH keys must not have a passphrase on them 
