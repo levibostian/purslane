@@ -1,3 +1,10 @@
+# [1.3.0](https://github.com/levibostian/Purslane/compare/1.2.0...1.3.0) (2020-07-05)
+
+
+### Features
+
+* add homebrew deploy for purslane ([3b970d5](https://github.com/levibostian/Purslane/commit/3b970d52bbdd69490877983eb91e6836eaa86528))
+
 # [1.2.0](https://github.com/levibostian/Purslane/compare/1.1.0...1.2.0) (2020-07-05)
 
 
