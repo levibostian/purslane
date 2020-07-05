@@ -1,3 +1,10 @@
+## [1.4.1](https://github.com/levibostian/Purslane/compare/1.4.0...1.4.1) (2020-07-05)
+
+
+### Bug Fixes
+
+* snapcraft config plugs fix ([479beb7](https://github.com/levibostian/Purslane/commit/479beb7beac29456fdc18f6b8d9351d8eb2ba230))
+
 # [1.4.0](https://github.com/levibostian/Purslane/compare/1.3.0...1.4.0) (2020-07-05)
 
 
