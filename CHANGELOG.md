@@ -1,3 +1,10 @@
+# [1.2.0](https://github.com/levibostian/Purslane/compare/1.1.0...1.2.0) (2020-07-05)
+
+
+### Features
+
+* add dockerfile to run CLI in ([90381d0](https://github.com/levibostian/Purslane/commit/90381d0831b96778095f33a5e1c84be7ad09c6c6))
+
 # [1.1.0](https://github.com/levibostian/Purslane/compare/1.0.1...1.1.0) (2020-07-04)
 
 
