@@ -102,12 +102,12 @@ You can run the Purslane CLI via a Docker image. There is [a public Purslane Doc
 
 Here is an example `docker run` statement to run the Docker purslane CLI:
 ```
-docker run --rm -v $(pwd)/purslane.yaml:/root/.purslane.yaml -v /home/.ssh/:/root/ssh purslane:latest
+docker run --rm -v $(pwd)/purslane.yaml:/config.yaml -v /home/.ssh/:/ssh levibostian/purslane:latest run --config /config.yaml
 ```
 
-The Purslane Docker image does have the 1 assumption that you need to provide the config file to `/root/.purslane.yaml` on the image. Besides that, all other files you provide to the Docker container is all configurable to you because you set all of the paths inside of your purslane config file (example: the ssh files). 
+> Note: The home directory of the Docker image is set to `/root`. You can use `~/` in the config file to refer to this path. 
 
-The Purslane public docker image tries to be as minimal as possible. [Check out the Dockerfile](Dockerfile) to learn more.
+[The Dockerfile](Dockerfile) is setup quite easily. It just runs the purslane CLI and everything that you add to the end of the `docker run` command gets passed as arguments to the CLI. So the example above with `docker run ... run --config /config.yaml` means that you are running `/purslane run --config /config.yaml` inside of the Docker container. 
 
 ## Development 
 
