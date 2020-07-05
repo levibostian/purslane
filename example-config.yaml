@@ -21,8 +21,8 @@ server: # Optional - sets default values for you if left out.
 
 # Required. These keys are used to run commands against the server once it's created. The machine you run the CLI from will SSH into the created server and send commands to it. 
 # **Note:** At this time, SSH keys must not have a passphrase on them 
-public_ssh_key_path: "~/.ssh/id_rsa.pub"
-private_ssh_key_path: "~/.ssh/id_rsa"
+public_ssh_key_path: "~/ssh/purslane.pub"
+private_ssh_key_path: "~/ssh/purslane"
 
 docker_run: # Optional. Purslane runs a default set that will run the docker container just fine. 
   extra_args: "-p 5000:5000" # Append arguments to the `docker run` command. Great place to add ports bindings or environment variables, for example. 
