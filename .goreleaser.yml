@@ -38,6 +38,22 @@ brews:
     folder: Formula
     homepage: "https://github.com/levibostian/purslane"
 
+snapcrafts:
+  - name: purslane
+    publish: true
+    summary: Scalable, flexible, affordable, and safe way to perform periodic tasks.
+    description: Run a single docker container inside of a cloud server as if it was a CLI.
+    grade: stable
+    confinement: strict
+    license: MIT
+    apps:
+      purslane:
+        plugs: ["home", "network", "personal-files"]
+    plugs:
+      personal-files:
+        read:
+        - $HOME/.purslane
+
 # skip changelog generation because semantic release does that for us already. Go releaser updates existing github releases if there is one.
 changelog:
   skip: true 
