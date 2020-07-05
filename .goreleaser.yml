@@ -48,10 +48,11 @@ snapcrafts:
     license: MIT
     apps:
       purslane:
-        plugs: ["home", "network", "personal-files"]
+        plugs: ["home", "network", "config-file"]
     plugs:
-      personal-files:
-        read:
+      config-file:
+        interface: personal-files
+        read:      
         - $HOME/.purslane
 
 # skip changelog generation because semantic release does that for us already. Go releaser updates existing github releases if there is one.
