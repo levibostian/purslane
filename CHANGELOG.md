@@ -1,3 +1,10 @@
+# [1.4.0](https://github.com/levibostian/Purslane/compare/1.3.0...1.4.0) (2020-07-05)
+
+
+### Features
+
+* configure snapcraft build/deploy ([b859354](https://github.com/levibostian/Purslane/commit/b8593549e172bd7264e4c626b025ffa1f9da5ef7))
+
 # [1.3.0](https://github.com/levibostian/Purslane/compare/1.2.0...1.3.0) (2020-07-05)
 
 
