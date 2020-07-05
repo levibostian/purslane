@@ -30,6 +30,14 @@ dockers:
     - "levibostian/purslane:latest"
     - "levibostian/purslane:{{ .Tag }}"
   
+brews:
+  - name: purslane
+    github:
+      owner: levibostian
+      name: homebrew-tap
+    folder: Formula
+    homepage: "https://github.com/levibostian/purslane"
+
 # skip changelog generation because semantic release does that for us already. Go releaser updates existing github releases if there is one.
 changelog:
   skip: true 

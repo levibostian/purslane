@@ -23,7 +23,7 @@ jobs:
     - stage: deploy
       script: 
         # Docker login is required by goreleaser 
-        - test -n "$TRAVIS_TAG" && docker login -u=levibostian -p="$DOCKER_PASSWORD"
+        - docker login -u=levibostian -p="$DOCKER_PASSWORD"
         # Use nvm to install and use the Node LTS version (nvm is installed on all Travis images)
         - nvm install lts/*; npm i @semantic-release/git @semantic-release/changelog @semantic-release/exec; npx semantic-release;
 
