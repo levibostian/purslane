@@ -88,11 +88,10 @@ docker: # Required.
 
 Since Purslane is a very low resources CLI application, you can run it directly on a server of yours. 
 
-If you create your Purslane config file on your server, you can install the CLI easily from [GitHub releases](https://github.com/levibostian/purslane/releases) with 1 command:
-
-```
-curl -sf https://gobinaries.com/levibostian/Purslane | sh
-```
+There are many ways to download the CLI. 
+1. Download the binary directly from [GitHub releases](https://github.com/levibostian/purslane/releases). 
+2. `curl -sf https://gobinaries.com/levibostian/Purslane | sh`
+3. `brew install levibostian/tap/purslane`
 
 You now have the CLI installed on your machine. Run `purslane --help` to learn about the CLI. 
 
