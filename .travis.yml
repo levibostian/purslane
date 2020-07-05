@@ -6,6 +6,11 @@ go:
 services:
 - docker # required to build/deploy docker image
 
+addons:
+  apt:
+    packages:
+    - snapcraft # needed for snapcraft publication
+
 # https://github.com/aevea/commitsar/issues/230
 git:
   depth: false
@@ -22,6 +27,8 @@ jobs:
         - curl -sL https://git.io/goreleaser | bash -s build --rm-dist --snapshot    
     - stage: deploy
       script: 
+        # snapcraft login so we can publish to snap store
+        - gem install cici && cici decrypt && snapcraft login --with snap.login
         # Docker login is required by goreleaser 
         - docker login -u=levibostian -p="$DOCKER_PASSWORD"
         # Use nvm to install and use the Node LTS version (nvm is installed on all Travis images)

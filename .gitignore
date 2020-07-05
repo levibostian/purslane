@@ -1,3 +1,7 @@
+secrets.tar
+secrets
+snap.login
+
 dist/
 node_modules/
 
