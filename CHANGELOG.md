@@ -1,3 +1,10 @@
+## [1.4.2](https://github.com/levibostian/Purslane/compare/1.4.1...1.4.2) (2020-07-06)
+
+
+### Bug Fixes
+
+* link to github over twitter ([8a099e9](https://github.com/levibostian/Purslane/commit/8a099e95507b8198a78e6c1a40645fdfa6e799a5))
+
 ## [1.4.1](https://github.com/levibostian/Purslane/compare/1.4.0...1.4.1) (2020-07-05)
 
 
