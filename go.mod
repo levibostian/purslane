@@ -1,6 +1,6 @@
 module github.com/levibostian/purslane
 
-go 1.14
+go 1.15
 
 require (
 	github.com/digitalocean/godo v1.35.1
