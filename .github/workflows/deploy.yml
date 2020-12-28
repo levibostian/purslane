@@ -5,6 +5,10 @@ on:
       - master 
       - beta
 
+env:
+  CICI_DECRYPT_KEY: ${{ secrets.CICI_DECRYPT_KEY }}
+  CICI_DECRYPT_IV: ${{ secrets.CICI_DECRYPT_IV }}
+
 jobs:
   deploy:
     name: Deploy app
