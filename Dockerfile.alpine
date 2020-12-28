@@ -1,0 +1,11 @@
+FROM alpine:latest
+
+# How to build image and run it:
+# 
+# GOOS=linux GOARCH=arm64 go build
+# docker build -t purslane:alpine -f Dockerfile.alpine .
+# docker run --rm -it purslane:alpine --help
+
+# Copy to /sbin because it's in PATH. Your scripts can then use `purslane` to execute binary. 
+COPY purslane /sbin
+ENTRYPOINT ["/sbin/purslane"] 

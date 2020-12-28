@@ -26,9 +26,24 @@ snapshot:
   name_template: "{{ .Tag }}-next"
 
 dockers:
-  - image_templates:
+  # Default, slim, no shell images 
+  - goos: linux
+    goarch: amd64
+    dockerfile: Dockerfile
+    image_templates:
     - "levibostian/purslane:latest"
-    - "levibostian/purslane:{{ .Tag }}"
+    - "levibostian/purslane:{{ .Major }}"
+    - "levibostian/purslane:{{ .Major }}.{{ .Minor }}"
+    - "levibostian/purslane:{{ .Major }}.{{ .Minor }}.{{ .Patch }}"
+  # Alpine 
+  - goos: linux
+    goarch: amd64
+    dockerfile: Dockerfile.alpine
+    image_templates:
+    - "levibostian/purslane:latest-alpine"    
+    - "levibostian/purslane:{{ .Major }}-alpine"
+    - "levibostian/purslane:{{ .Major }}.{{ .Minor }}-alpine"
+    - "levibostian/purslane:{{ .Major }}.{{ .Minor }}.{{ .Patch }}-alpine"
   
 brews:
   - name: purslane
