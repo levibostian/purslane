@@ -1,3 +1,10 @@
+# [1.5.0-beta.1](https://github.com/levibostian/purslane/compare/1.4.2...1.5.0-beta.1) (2020-12-28)
+
+
+### Features
+
+* add alpine docker image ([3f0f53f](https://github.com/levibostian/purslane/commit/3f0f53f0ca0366524676cc94d12386a8a6167d52))
+
 ## [1.4.2](https://github.com/levibostian/Purslane/compare/1.4.1...1.4.2) (2020-07-06)
 
 
