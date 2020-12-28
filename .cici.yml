@@ -1,4 +1,0 @@
-default:
-  secrets:
-    - "snap.login"
-  
