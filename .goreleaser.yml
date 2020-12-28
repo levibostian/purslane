@@ -22,8 +22,6 @@ archives:
     amd64: x86_64
 checksum:
   name_template: 'checksums.txt'
-snapshot:
-  name_template: "{{ .Tag }}-next"
 
 dockers:
   # Default, slim, no shell images 
@@ -47,11 +45,14 @@ dockers:
   
 brews:
   - name: purslane
-    github:
+    tap:
       owner: levibostian
       name: homebrew-tap
     folder: Formula
     homepage: "https://github.com/levibostian/purslane"
+    # if a prerelease is indicated in the tag (example: 1.0.0-beta or 1.0.0-rc1) then an upload will not happen. 
+    # This is important so that homebrew remains stable for all users. 
+    skip_upload: auto
 
 # snapcrafts:
 #   - name: purslane
