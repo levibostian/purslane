@@ -2,6 +2,9 @@ secrets.tar
 secrets
 snap.login
 
+# the built binary
+purslane 
+
 dist/
 node_modules/
 

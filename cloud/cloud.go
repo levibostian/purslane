@@ -1,7 +1,7 @@
 package cloud
 
 import (
-	"github.com/levibostian/Purslane/config"
+	"github.com/levibostian/purslane/config"
 )
 
 // Cloud provider

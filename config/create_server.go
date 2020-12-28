@@ -5,7 +5,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/levibostian/Purslane/ui"
+	"github.com/levibostian/purslane/ui"
 )
 
 // CreateServerConfig -

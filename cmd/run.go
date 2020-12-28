@@ -3,7 +3,7 @@ package cmd
 import (
 	"github.com/spf13/cobra"
 
-	"github.com/levibostian/Purslane/run"
+	"github.com/levibostian/purslane/run"
 )
 
 // runCmd represents the run command

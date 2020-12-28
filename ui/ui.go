@@ -5,12 +5,12 @@ import (
 	"os"
 
 	"github.com/fatih/color"
-	cliConfig "github.com/levibostian/Purslane/cliconfig"
+	cliConfig "github.com/levibostian/purslane/cliconfig"
 )
 
 func ShouldNotHappen(err error) {
 	color.Red("[BUG] Something happened that should not have. That means there is probably a bug inside of Purslane.")
-	color.Red("Report an issue here: https://github.com/levibostian/Purslane/issues/new, and give this message:")
+	color.Red("Report an issue here: https://github.com/levibostian/purslane/issues/new, and give this message:")
 	fmt.Print(err)
 	panic("Exiting...")
 }

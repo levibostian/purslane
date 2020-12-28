@@ -1,10 +1,10 @@
 package run
 
 import (
-	"github.com/levibostian/Purslane/cloud"
-	"github.com/levibostian/Purslane/config"
-	"github.com/levibostian/Purslane/ssh"
-	"github.com/levibostian/Purslane/ui"
+	"github.com/levibostian/purslane/cloud"
+	"github.com/levibostian/purslane/config"
+	"github.com/levibostian/purslane/ssh"
+	"github.com/levibostian/purslane/ui"
 )
 
 // Execute The run command. Runs the Docker container in a cloud vm. Delegates out work to other parts of the code.

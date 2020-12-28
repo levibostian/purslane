@@ -6,9 +6,9 @@ import (
 	"os"
 	"time"
 
-	"github.com/levibostian/Purslane/cloud"
-	"github.com/levibostian/Purslane/config"
-	"github.com/levibostian/Purslane/ui"
+	"github.com/levibostian/purslane/cloud"
+	"github.com/levibostian/purslane/config"
+	"github.com/levibostian/purslane/ui"
 	"golang.org/x/crypto/ssh"
 )
 

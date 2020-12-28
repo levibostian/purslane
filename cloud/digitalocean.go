@@ -7,8 +7,8 @@ import (
 
 	"github.com/digitalocean/godo"
 
-	"github.com/levibostian/Purslane/config"
-	"github.com/levibostian/Purslane/ui"
+	"github.com/levibostian/purslane/config"
+	"github.com/levibostian/purslane/ui"
 )
 
 type digitaloceanCloudProvider struct {
