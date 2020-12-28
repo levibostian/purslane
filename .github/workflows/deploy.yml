@@ -1,0 +1,28 @@
+name: Deployment 
+on:
+  push:
+    branches:
+      - master 
+      - beta
+
+jobs:
+  deploy:
+    name: Deploy app
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-go@v2
+        with:
+          go-version: '^1.15' 
+      - name: Login to Docker registry 
+        run: docker login -u=levibostian -p="${{ secrets.DOCKER_TOKEN }}"
+      - name: Get secrets 
+        run: sudo gem install cici && cici decrypt && snapcraft login --with snap.login
+      - name: Setup node
+        uses: actions/setup-node@v2
+        with:
+          node-version: 12
+      - name: Semantic release make release 
+        run: npm i @semantic-release/git @semantic-release/changelog @semantic-release/exec; npx semantic-release;
+        env: 
+          GITHUB_TOKEN: ${{ secrets.REPO_PUSH_TOKEN }} # personal access token with push access to the repo

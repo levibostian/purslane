@@ -1,0 +1,28 @@
+name: Pull request  
+on:
+  pull_request:
+
+jobs:
+  goreleaser:
+    name: Test goreleaser 
+    runs-on: ubuntu-latest    
+    steps:    
+      - uses: actions/checkout@v2
+      - uses: actions/setup-go@v2
+        with:
+          go-version: '^1.15' 
+      # Validate the config for goreleaser 
+      - name: Run GoReleaser
+        uses: goreleaser/goreleaser-action@v2
+        with:
+          args: check
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      # goreleaser snapshots are good to test goreleaser is working 
+      # https://goreleaser.com/customization/snapshots/
+      - name: Run GoReleaser
+        uses: goreleaser/goreleaser-action@v2
+        with:
+          args: build --rm-dist --snapshot 
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -22,38 +22,54 @@ archives:
     amd64: x86_64
 checksum:
   name_template: 'checksums.txt'
-snapshot:
-  name_template: "{{ .Tag }}-next"
 
 dockers:
-  - image_templates:
+  # Default, slim, no shell images 
+  - goos: linux
+    goarch: amd64
+    dockerfile: Dockerfile
+    image_templates:
     - "levibostian/purslane:latest"
-    - "levibostian/purslane:{{ .Tag }}"
+    - "levibostian/purslane:{{ .Major }}"
+    - "levibostian/purslane:{{ .Major }}.{{ .Minor }}"
+    - "levibostian/purslane:{{ .Major }}.{{ .Minor }}.{{ .Patch }}"
+  # Alpine 
+  - goos: linux
+    goarch: amd64
+    dockerfile: Dockerfile.alpine
+    image_templates:
+    - "levibostian/purslane:latest-alpine"    
+    - "levibostian/purslane:{{ .Major }}-alpine"
+    - "levibostian/purslane:{{ .Major }}.{{ .Minor }}-alpine"
+    - "levibostian/purslane:{{ .Major }}.{{ .Minor }}.{{ .Patch }}-alpine"
   
 brews:
   - name: purslane
-    github:
+    tap:
       owner: levibostian
       name: homebrew-tap
     folder: Formula
     homepage: "https://github.com/levibostian/purslane"
+    # if a prerelease is indicated in the tag (example: 1.0.0-beta or 1.0.0-rc1) then an upload will not happen. 
+    # This is important so that homebrew remains stable for all users. 
+    skip_upload: auto
 
-snapcrafts:
-  - name: purslane
-    publish: true
-    summary: Scalable, flexible, affordable, and safe way to perform periodic tasks.
-    description: Run a single docker container inside of a cloud server as if it was a CLI.
-    grade: stable
-    confinement: strict
-    license: MIT
-    apps:
-      purslane:
-        plugs: ["home", "network", "config-file"]
-    plugs:
-      config-file:
-        interface: personal-files
-        read:      
-        - $HOME/.purslane
+# snapcrafts:
+#   - name: purslane
+#     publish: true
+#     summary: Scalable, flexible, affordable, and safe way to perform periodic tasks.
+#     description: Run a single docker container inside of a cloud server as if it was a CLI.
+#     grade: stable
+#     confinement: strict
+#     license: MIT
+#     apps:
+#       purslane:
+#         plugs: ["home", "network", "config-file"]
+#     plugs:
+#       config-file:
+#         interface: personal-files
+#         read:      
+#         - $HOME/.purslane
 
 # skip changelog generation because semantic release does that for us already. Go releaser updates existing github releases if there is one.
 changelog:

@@ -1,7 +1,7 @@
 package cloud
 
 import (
-	"github.com/levibostian/Purslane/config"
+	"github.com/levibostian/purslane/config"
 )
 
 func GetCloudProvider(coreConfig *config.CoreConfig, cloudConfig *config.CloudConfig) CloudProvider {
